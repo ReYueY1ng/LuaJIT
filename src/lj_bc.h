@@ -92,6 +92,14 @@
   _(ISTYPE,	var,	___,	lit,	___) \
   _(ISNUM,	var,	___,	lit,	___) \
   \
+  /* Constant ops. */ \
+  _(KSTR,	dst,	___,	str,	___) \
+  _(KCDATA,	dst,	___,	cdata,	___) \
+  _(KSHORT,	dst,	___,	lits,	___) \
+  _(KNUM,	dst,	___,	num,	___) \
+  _(KPRI,	dst,	___,	pri,	___) \
+  _(KNIL,	base,	___,	base,	___) \
+  \
   /* Unary ops. */ \
   _(MOV,	dst,	___,	var,	___) \
   _(NOT,	dst,	___,	var,	___) \
@@ -120,23 +128,6 @@
   _(POW,	dst,	var,	var,	pow) \
   _(CAT,	dst,	rbase,	rbase,	concat) \
   \
-  /* Constant ops. */ \
-  _(KSTR,	dst,	___,	str,	___) \
-  _(KCDATA,	dst,	___,	cdata,	___) \
-  _(KSHORT,	dst,	___,	lits,	___) \
-  _(KNUM,	dst,	___,	num,	___) \
-  _(KPRI,	dst,	___,	pri,	___) \
-  _(KNIL,	base,	___,	base,	___) \
-  \
-  /* Upvalue and function ops. */ \
-  _(UGET,	dst,	___,	uv,	___) \
-  _(USETV,	uv,	___,	var,	___) \
-  _(USETS,	uv,	___,	str,	___) \
-  _(USETN,	uv,	___,	num,	___) \
-  _(USETP,	uv,	___,	pri,	___) \
-  _(UCLO,	rbase,	___,	jump,	___) \
-  _(FNEW,	dst,	___,	func,	gc) \
-  \
   /* Table ops. */ \
   _(TNEW,	dst,	___,	lit,	gc) \
   _(TDUP,	dst,	___,	tab,	gc) \
@@ -151,6 +142,15 @@
   _(TSETB,	var,	var,	lit,	newindex) \
   _(TSETM,	base,	___,	num,	newindex) \
   _(TSETR,	var,	var,	var,	newindex) \
+  \
+  /* Upvalue and function ops. */ \
+  _(UGET,	dst,	___,	uv,	___) \
+  _(USETV,	uv,	___,	var,	___) \
+  _(USETS,	uv,	___,	str,	___) \
+  _(USETN,	uv,	___,	num,	___) \
+  _(USETP,	uv,	___,	pri,	___) \
+  _(UCLO,	rbase,	___,	jump,	___) \
+  _(FNEW,	dst,	___,	func,	gc) \
   \
   /* Calls and vararg handling. T = tail call. */ \
   _(CALLM,	base,	lit,	lit,	call) \
