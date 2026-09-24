@@ -4,9 +4,9 @@
 工具链。相对官方上游，唯一的功能性改动是**重排字节码操作码表（BCDEF）**，使本仓库的
 `string.dump` / 字节码读写与游戏内嵌的 LuaJIT 保持一致。
 
-> 《迷你世界》逆向工程主体项目见 [MNReverse](https://github.com/ReYueY1ng/MNReverse)：
-> 世界存档、区块 FlatBuffer、调色板编码、纹理/加密、Reflex 二进制协议，以及基于本仓库
-> 字节码布局的 Lua 字节码 dump / 反编译 / 重编译。
+> 《迷你世界》逆向工程主体项目是 **MNReverse**（私有仓库，不在 GitHub 公开）：世界存档、
+> 区块 FlatBuffer、调色板编码、纹理/加密、Reflex 二进制协议，以及基于本仓库字节码布局的
+> Lua 字节码 dump / 反编译 / 重编译。
 
 ## 这是什么
 
@@ -27,6 +27,9 @@
 
 - 常量指令 `KSTR / KCDATA / KSHORT / KNUM / KPRI / KNIL` 移到 `ISNUM` 之后、`MOV` 之前；
 - 上值/函数指令 `UGET / USETV / USETS / USETN / USETP / UCLO / FNEW` 移到表指令之后。
+
+该顺序不是推测：通过一个 Lua 脚本分别编译官方 LuaJIT 与游戏的字节码，逐项对比 `string.dump`
+差异后确定。
 
 ## 分支说明
 
@@ -66,8 +69,9 @@ make -j
 ## CI 与 Release
 
 [`.github/workflows/build-release.yml`](.github/workflows/build-release.yml) 使用
-GitHub Actions（`windows-latest` + MSVC），同时构建 `v2.1` 与 `old` 两个分支，将
-`luajit.exe` / `lua51.dll` / `lua51.lib` 打包上传，并发布为滚动 Release：
+GitHub Actions（`windows-latest` + MSVC），同时构建 `v2.1` 与 `old` 两个分支并发布为滚动
+Release。每个 Release 同时提供打包 zip 与可直接下载的单个文件（含 **`lua51.dll`**、
+`luajit.exe`、`lua51.lib`）：
 
 | Release tag | 对应分支 |
 |---|---|
