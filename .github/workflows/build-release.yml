@@ -52,7 +52,8 @@ jobs:
           Copy-Item -Path COPYRIGHT -Destination $dist
           $zip = "dist/$name.zip"
           Compress-Archive -Path "$dist/*" -DestinationPath $zip -Force
-          Get-ChildItem dist
+          Copy-Item -Path src/luajit.exe, src/lua51.dll, src/lua51.lib -Destination "dist"
+          Get-ChildItem -Recurse dist
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -72,9 +73,13 @@ jobs:
 
             - Branch: `${{ matrix.branch }}`
             - Commit: `${{ github.sha }}`
-            - Package: `luajit.exe`, `lua51.dll`, `lua51.lib`
+            - Files: `lua51.dll`, `luajit.exe`, `lua51.lib`, plus a packaged `.zip`
 
             This is a rolling release: the same tag is updated on every push to the branch.
-          files: dist/*.zip
+          files: |
+            dist/*.zip
+            dist/luajit.exe
+            dist/lua51.dll
+            dist/lua51.lib
           prerelease: false
           make_latest: false
