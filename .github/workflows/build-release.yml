@@ -1,0 +1,81 @@
+name: Build & Release (MSVC)
+
+on:
+  push:
+    branches:
+      - v2.1
+      - old
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  # One job per branch, so two rolling releases never race each other.
+  group: build-release-${{ github.workflow }}-${{ matrix.branch }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    name: Windows x64 (MSVC) - ${{ matrix.branch }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        branch:
+          - v2.1
+          - old
+    steps:
+      - name: Checkout ${{ matrix.branch }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+          fetch-depth: 0
+
+      - name: Setup MSVC (x64)
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Build LuaJIT
+        working-directory: src
+        shell: cmd
+        run: msvcbuild.bat
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $branch = "${{ matrix.branch }}"
+          $name = "luajit-$branch-windows-x64"
+          $dist = Join-Path "dist" $name
+          New-Item -ItemType Directory -Force -Path $dist | Out-Null
+          Copy-Item -Path src/luajit.exe, src/lua51.dll, src/lua51.lib -Destination $dist
+          Copy-Item -Path COPYRIGHT -Destination $dist
+          $zip = "dist/$name.zip"
+          Compress-Archive -Path "$dist/*" -DestinationPath $zip -Force
+          Get-ChildItem dist
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: luajit-${{ matrix.branch }}-windows-x64
+          path: dist/*.zip
+          if-no-files-found: error
+
+      - name: Publish rolling release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ matrix.branch }}-rolling
+          target_commitish: ${{ matrix.branch }}
+          name: LuaJIT for Mini World - ${{ matrix.branch }} (rolling)
+          body: |
+            Windows x64 build of the `${{ matrix.branch }}` branch, built with MSVC.
+
+            - Branch: `${{ matrix.branch }}`
+            - Commit: `${{ github.sha }}`
+            - Package: `luajit.exe`, `lua51.dll`, `lua51.lib`
+
+            This is a rolling release: the same tag is updated on every push to the branch.
+          files: dist/*.zip
+          prerelease: false
+          make_latest: false
