@@ -10,15 +10,14 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  # One job per branch, so two rolling releases never race each other.
-  group: build-release-${{ github.workflow }}-${{ matrix.branch }}
-  cancel-in-progress: false
-
 jobs:
   windows:
     name: Windows x64 (MSVC) - ${{ matrix.branch }}
     runs-on: windows-latest
+    concurrency:
+      # One job per branch, so two rolling releases never race each other.
+      group: build-release-${{ github.workflow }}-${{ matrix.branch }}
+      cancel-in-progress: false
     strategy:
       fail-fast: false
       matrix:
